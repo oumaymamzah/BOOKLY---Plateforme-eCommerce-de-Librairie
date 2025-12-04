@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editors{% endblock %}
+
+{% block body %}
+<section id="page-header" class="padding-large" style="background-image: url('{{ asset('images/banner-image-bg.jpg') }}'); background-size: cover; background-repeat: no-repeat; background-position: center; height: 300px; display: flex; align-items: center;">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h1 class="display-4 text-white">Editors</h1>
+        <p class="lead text-white">Our publishing partners</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="padding-large">
+  <div class="container">
+    <div class="row">
+      {% for editeur in editeurs %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ editeur.nom }}</h5>
+            <p class="card-text">
+              <strong>Country:</strong> {{ editeur.pays ?: 'Not specified' }}<br>
+              <strong>Address:</strong> {{ editeur.adresse ?: 'Not specified' }}<br>
+              <strong>Phone:</strong> {{ editeur.telephone ?: 'Not specified' }}
+            </p>
+            <a href="#" class="btn btn-primary">View Books</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

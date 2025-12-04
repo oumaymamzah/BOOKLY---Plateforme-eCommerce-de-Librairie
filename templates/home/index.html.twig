@@ -1,0 +1,622 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bookly - Librairie eCommerce{% endblock %}
+
+{% block body %}
+<div id="preloader" class="preloader-container">
+  <div class="book">
+    <div class="inner">
+      <div class="left"></div>
+      <div class="middle"></div>
+      <div class="right"></div>
+    </div>
+    <ul>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </div>
+</div>
+
+<div class="search-popup">
+  <div class="search-popup-container">
+
+    <form role="search" method="get" class="search-form" action="">
+      <input type="search" id="search-form" class="search-field" placeholder="Tapez et appuyez sur Entrée" value=""
+        name="s" />
+      <button type="submit" class="search-submit"><svg class="search">
+          <use xlink:href="#search"></use>
+        </svg></button>
+    </form>
+
+    <h5 class="cat-list-title">Parcourir les Catégories</h5>
+
+    <ul class="cat-list">
+      {% for categorie in categories|sort((a, b) => a.nom <=> b.nom) %}
+      <li class="cat-list-item">
+        <a href="{{ path('app_category_show', {'id': categorie.id}) }}" title="{{ categorie.nom }}">{{ categorie.nom }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+
+  </div>
+</div>
+
+
+
+
+<section id="limited-offer" class="padding-large"
+  style="background-image: url(images/banner-image-bg-1.jpg); background-size: cover; background-repeat: no-repeat; background-position: center; height: 800px;">
+  <div class="container">
+    <div class="row d-flex align-items-center">
+      <div class="col-md-6 text-center">
+        <div class="image-holder">
+          <img src="{{ asset('images/banner-image3.png') }}" class="img-fluid" alt="banner">
+        </div>
+      </div>
+      <div class="col-md-5 offset-md-1 mt-5 mt-md-0 text-center text-md-start">
+        <h2>30% de réduction sur tous les articles. Dépêchez-vous !!!</h2>
+        <div id="countdown-clock" class="text-dark d-flex align-items-center my-3">
+          <div class="time d-grid pe-3">
+            <span class="days fs-1 fw-normal"></span>
+            <small>Jours</small>
+          </div>
+          <span class="fs-1 text-primary">:</span>
+          <div class="time d-grid pe-3 ps-3">
+            <span class="hours fs-1 fw-normal"></span>
+            <small>Hrs</small>
+          </div>
+          <span class="fs-1 text-primary">:</span>
+          <div class="time d-grid pe-3 ps-3">
+            <span class="minutes fs-1 fw-normal"></span>
+            <small>Min</small>
+          </div>
+          <span class="fs-1 text-primary">:</span>
+          <div class="time d-grid ps-3">
+            <span class="seconds fs-1 fw-normal"></span>
+            <small>Sec</small>
+          </div>
+        </div>
+        <a href="#shop" class="btn mt-3">Acheter la Collection</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section id="best-selling-items" class="position-relative padding-large ">
+  <div class="container">
+    <div class="section-title d-md-flex justify-content-between align-items-center mb-4">
+      <h3 class="d-flex align-items-center">Articles les plus vendus</h3>
+      <a href="{{ path('app_categories') }}" class="btn">Voir Tous les Livres</a>
+    </div>
+    <div class="position-absolute top-50 end-0 pe-0 pe-xxl-5 me-0 me-xxl-5 swiper-next product-slider-button-next">
+      <svg class="chevron-forward-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
+        <use xlink:href="#alt-arrow-right-outline"></use>
+      </svg>
+    </div>
+    <div class="position-absolute top-50 start-0 ps-0 ps-xxl-5 ms-0 ms-xxl-5 swiper-prev product-slider-button-prev">
+      <svg class="chevron-back-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
+        <use xlink:href="#alt-arrow-left-outline"></use>
+      </svg>
+    </div>
+    <div class="swiper product-swiper">
+      <div class="swiper-wrapper">
+        {% for livre in livres %}
+        <div class="swiper-slide">
+          <div class="card position-relative p-4 border rounded-3">
+            {% if livre.prixUnitaire > 100 %}
+            <div class="position-absolute">
+              <p class="bg-primary py-1 px-3 fs-6 text-white rounded-2">-10%</p>
+            </div>
+            {% endif %}
+            <img src="{% if livre.pdfFilename %}{{ asset('uploads/images/' ~ livre.pdfFilename) }}{% else %}{{ asset('images/product-item' ~ loop.index ~ '.png') }}{% endif %}" class="img-fluid shadow-sm" alt="product item">
+            <h6 class="mt-4 mb-0 fw-bold"><a href="{{ path('app_livre_show', {'id': livre.id}) }}">{{ livre.titre }}</a></h6>
+            <div class="review-content d-flex">
+              <p class="my-2 me-2 fs-6 text-black-50">{{ livre.auteurs ? livre.auteurs|join(', ') : 'Unknown' }}</p>
+
+              <div class="rating text-warning d-flex align-items-center">
+                <svg class="star star-fill">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+              </div>
+            </div>
+            <span class="price text-primary fw-bold mb-2 fs-5">{{ livre.prixUnitaire }} DT</span>
+            <div class="card-concern position-absolute start-0 end-0 d-flex gap-2">
+              <form action="{{ path('app_cart_add', {'id': livre.id}) }}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-dark" data-bs-toggle="tooltip" data-bs-placement="top"
+                  data-bs-title="Ajouter au panier">
+                  <svg class="cart">
+                    <use xlink:href="#cart"></use>
+                  </svg>
+                </button>
+              </form>
+              {% if app.session.get('wishlist') is defined and livre.id in app.session.get('wishlist') %}
+                <a href="{{ path('app_wishlist_remove', {'id': livre.id}) }}" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Retirer de la liste d'envies">
+                  <svg class="wishlist">
+                    <use xlink:href="#heart"></use>
+                  </svg>
+                </a>
+              {% else %}
+                <a href="{{ path('app_wishlist_add', {'id': livre.id}) }}" class="btn btn-dark" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ajouter à la liste d'envies">
+                  <svg class="wishlist">
+                    <use xlink:href="#heart"></use>
+                  </svg>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="categories" class="padding-large pt-0">
+  <div class="container">
+    <div class="section-title overflow-hidden mb-4">
+      <h3 class="d-flex align-items-center">Catégories</h3>
+    </div>
+    <div class="row justify-content-between">
+      {% for categorie in featuredCategories %}
+      <div class="col-md-4">
+        <div class="card mb-4 border-0 rounded-3 position-relative">
+          <a href="{{ path('app_category_show', {'id': categorie.id}) }}">
+            <img src="{% if categorie.imageFilename %}{{ asset('uploads/images/' ~ categorie.imageFilename) }}{% else %}{{ asset('images/category' ~ loop.index ~ '.jpg') }}{% endif %}" class="img-fluid rounded-3" alt="category">
+            <h6 class="position-absolute bottom-0 bg-primary m-4 py-2 px-3 rounded-3">
+              <span class="text-white">{{ categorie.nom }}</span>
+            </h6>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section id="items-listing" class="padding-large">
+  <div class="container">
+    <div class="row">
+
+      <div class="col-12 mb-4 mb-lg-0">
+        <div class="latest-items border rounded-3 p-4">
+          <div class="section-title overflow-hidden mb-5 mt-2">
+            <h3 class="d-flex flex-column mb-0" style="font-size: 2rem; font-weight: bold;">Derniers articles</h3>
+          </div>
+          <div class="items-lists d-flex justify-content-between">
+            {% for livre in livres|slice(3, 3) %}
+            <div class="item d-flex flex-column">
+              <img src="{% if livre.pdfFilename %}{{ asset('uploads/images/' ~ livre.pdfFilename) }}{% else %}{{ asset('images/product-item' ~ ((loop.index + 3) % 12 + 1) ~ '.png') }}{% endif %}" class="img-fluid shadow-sm" alt="product item">
+              <div class="item-content mt-3">
+                <h6 class="mb-0 fw-bold"><a href="{{ path('app_livre_show', {'id': livre.id}) }}">{{ livre.titre }}</a></h6>
+                <div class="review-content d-flex">
+                  <p class="my-2 me-2 fs-6 text-black-50">{{ livre.auteurs ? livre.auteurs|join(', ') : 'Unknown' }}</p>
+                  <div class="rating text-warning d-flex align-items-center">
+                    <svg class="star star-fill">
+                      <use xlink:href="#star-fill"></use>
+                    </svg>
+                    <svg class="star star-fill">
+                      <use xlink:href="#star-fill"></use>
+                    </svg>
+                    <svg class="star star-fill">
+                      <use xlink:href="#star-fill"></use>
+                    </svg>
+                    <svg class="star star-fill">
+                      <use xlink:href="#star-fill"></use>
+                    </svg>
+                    <svg class="star star-fill">
+                      <use xlink:href="#star-fill"></use>
+                    </svg>
+                  </div>
+                </div>
+                <span class="price text-primary fw-bold mb-2 fs-5">{{ livre.prixUnitaire }} DT</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="customers-reviews" class="position-relative padding-large"
+  style="background-image: url(images/banner-image-bg.jpg); background-size: cover; background-repeat: no-repeat; background-position: center; height: 600px;">
+  <div class="container offset-md-3 col-md-6 ">
+    <div class="position-absolute top-50 end-0 pe-0 pe-xxl-5 me-0 me-xxl-5 swiper-next testimonial-button-next">
+      <svg class="chevron-forward-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
+        <use xlink:href="#alt-arrow-right-outline"></use>
+      </svg>
+    </div>
+    <div class="position-absolute top-50 start-0 ps-0 ps-xxl-5 ms-0 ms-xxl-5 swiper-prev testimonial-button-prev">
+      <svg class="chevron-back-circle d-flex justify-content-center align-items-center p-2" width="80" height="80">
+        <use xlink:href="#alt-arrow-left-outline"></use>
+      </svg>
+    </div>
+    <div class="section-title mb-4 text-center">
+      <h3 class="mb-4">Avis clients</h3>
+    </div>
+    <div class="swiper testimonial-swiper ">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <div class="card position-relative text-left p-5 border rounded-3">
+            <blockquote>"I stumbled upon this bookstore while visiting the city, and it instantly became my favorite spot. The cozy atmosphere, friendly staff, and wide selection of books make every visit a delight!"</blockquote>
+            <div class="rating text-warning d-flex align-items-center">
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+            </div>
+            <h5 class="mt-1 fw-normal">Emma Chamberlin</h5>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="card position-relative text-left p-5 border rounded-3">
+            <blockquote>"As an avid reader, I'm always on the lookout for new releases, and this bookstore never disappoints. They always have the latest titles, and their recommendations have introduced me to some incredible reads!"</blockquote>
+            <div class="rating text-warning d-flex align-items-center">
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+            </div>
+            <h5 class="mt-1 fw-normal">Thomas John</h5>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="card position-relative text-left p-5 border rounded-3">
+            <blockquote>"I ordered a few books online from this store, and I was impressed by the quick delivery and careful packaging. It's clear that they prioritize customer satisfaction, and I'll definitely be shopping here again!"</blockquote>
+            <div class="rating text-warning d-flex align-items-center">
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+              <svg class="star star-fill">
+                <use xlink:href="#star-fill"></use>
+              </svg>
+            </div>
+            <h5 class="mt-1 fw-normal">Kevin Bryan</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="latest-posts" class="padding-large">
+  <div class="container">
+    <div class="section-title d-md-flex justify-content-between align-items-center mb-4">
+      <h3 class="d-flex align-items-center">Derniers articles</h3>
+      <a href="#" class="btn">Voir Tout</a>
+    </div>
+    <div class="row">
+      <div class="col-md-3 posts mb-4">
+        <img src="{{ asset('images/post-item1.jpg') }}" alt="post image" class="img-fluid rounded-3">
+        <a href="#" class="fs-6 text-primary">Books</a>
+        <h4 class="card-title mb-2 text-capitalize text-dark"><a href="#">10 Must-Read Books of the Year: Our Top Picks!</a></h4>
+        <p class="mb-2">Plongez dans le monde de la technologie de pointe avec notre dernier article de blog, où nous mettons en avant cinq gadgets essentiels. <span><a class="text-decoration-underline text-black-50" href="#">Lire la suite</a></span></p>
+      </div>
+      <div class="col-md-3 posts mb-4">
+        <img src="{{ asset('images/post-item2.jpg') }}" alt="post image" class="img-fluid rounded-3">
+        <a href="#" class="fs-6 text-primary">Books</a>
+        <h4 class="card-title mb-2 text-capitalize text-dark"><a href="#">The Fascinating Realm of Science Fiction</a></h4>
+        <p class="mb-2">Explorez l'intersection de la technologie et de la durabilité dans notre dernier article de blog. Découvrez l'innovation <span><a class="text-decoration-underline text-black-50" href="#">Lire la suite</a></span> </p>
+      </div>
+      <div class="col-md-3 posts mb-4">
+        <img src="{{ asset('images/post-item3.jpg') }}" alt="post image" class="img-fluid rounded-3">
+        <a href="#" class="fs-6 text-primary">Books</a>
+        <h4 class="card-title mb-2 text-capitalize text-dark"><a href="#">Finding Love in the Pages of a Book</a></h4>
+        <p class="mb-2">Restez en avance avec notre regard perspicace sur le paysage en évolution rapide de la technologie portable. <span><a class="text-decoration-underline text-black-50" href="#">Lire la suite</a></span></p>
+      </div>
+      <div class="col-md-3 posts mb-4">
+        <img src="{{ asset('images/post-item4.jpg') }}" alt="post image" class="img-fluid rounded-3">
+        <a href="#" class="fs-6 text-primary">Books</a>
+        <h4 class="card-title mb-2 text-capitalize text-dark"><a href="#">Reading for Mental Health: How Books Can Heal and Inspire</a></h4>
+        <p class="mb-2">Dans l'environnement de travail à distance d'aujourd'hui, la productivité est essentielle. Découvrez les meilleures applications et outils qui peuvent vous aider à rester <span><a class="text-decoration-underline text-black-50" href="#">Lire la suite</a></span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="instagram">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h3>Instagram</h3>
+    </div>
+    <div class="row">
+      {% for i in 1..6 %}
+      <div class="col-md-2">
+        <figure class="instagram-item position-relative rounded-3">
+          <a href="https://templatesjungle.com/" class="image-link position-relative">
+            <div class="icon-overlay position-absolute d-flex justify-content-center">
+              <svg class="instagram">
+                <use xlink:href="#instagram"></use>
+              </svg>
+            </div>
+            <img src="{{ asset('images/insta-item' ~ i ~ '.jpg') }}" alt="instagram" class="img-fluid rounded-3 insta-image">
+          </a>
+        </figure>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section id="company-services" class="padding-large pb-0">
+  <div class="container">
+    <div class="row justify-content-between">
+      <div class="col-lg-3 col-md-6 pb-3 pb-lg-0">
+        <div class="icon-box d-flex">
+          <div class="icon-box-icon pe-3 pb-3">
+            <svg class="cart-outline">
+              <use xlink:href="#cart-outline" />
+            </svg>
+          </div>
+          <div class="icon-box-content">
+            <h4 class="card-title mb-1 text-capitalize text-dark">Livraison gratuite</h4>
+
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 pb-3 pb-lg-0">
+        <div class="icon-box d-flex">
+          <div class="icon-box-icon pe-3 pb-3">
+            <svg class="quality">
+              <use xlink:href="#quality" />
+            </svg>
+          </div>
+          <div class="icon-box-content">
+            <h4 class="card-title mb-1 text-capitalize text-dark">Garantie qualité</h4>
+
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6 pb-3 pb-lg-0">
+        <div class="icon-box d-flex">
+          <div class="icon-box-icon pe-3 pb-3">
+            <svg class="shield-plus">
+              <use xlink:href="#shield-plus" />
+            </svg>
+          </div>
+          <div class="icon-box-content">
+            <h4 class="card-title mb-1 text-capitalize text-dark">Paiement 100% sécurisé</h4>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="footer" class="padding-large">
+  <div class="container">
+    <div class="row">
+      <div class="footer-top-area">
+        <div class="row d-flex flex-wrap justify-content-between">
+          <div class="col-lg-3 col-sm-6 pb-3">
+            <div class="footer-menu">
+              <img src="{{ asset('images/main-logo.png') }}" alt="logo" class="img-fluid mb-2">
+             
+    
+              <div class="social-links">
+                <ul class="d-flex list-unstyled">
+                  <li>
+                    <a href="#">
+                      <svg class="facebook">
+                        <use xlink:href="#facebook" />
+                      </svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <svg class="instagram">
+                        <use xlink:href="#instagram" />
+                      </svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <svg class="twitter">
+                        <use xlink:href="#twitter" />
+                      </svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <svg class="linkedin">
+                        <use xlink:href="#linkedin" />
+                      </svg>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <svg class="youtube">
+                        <use xlink:href="#youtube" />
+                      </svg>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-sm-6 pb-3">
+            <div class="footer-menu text-capitalize">
+              <h5 class="widget-title pb-2">Liens Rapides</h5>
+              <ul class="menu-list list-unstyled text-capitalize">
+                <li class="menu-item mb-1">
+                  <a href="{{ path('app_home') }}">Accueil</a>
+                </li>
+                <li class="menu-item mb-1">
+                  <a href="{{ path('app_categories') }}">Catégories</a>
+                </li>
+                <li class="menu-item mb-1">
+                  <a href="{{ path('app_editors') }}">Éditeurs</a>
+                </li>
+                <li class="menu-item mb-1">
+                  <a href="{{ path('app_live_features') }}">Fonctionnalités</a>
+                </li>
+                <li class="menu-item mb-1">
+                  <a href="{{ path('app_cart') }}">Panier</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6 pb-3">
+            <div class="footer-menu text-capitalize">
+              <h5 class="widget-title pb-2">Aide & Info</h5>
+              <ul class="menu-list list-unstyled">
+                <li class="menu-item mb-1">
+                  <a href="#">Suivre Votre Commande</a>
+                </li>
+                <li class="menu-item mb-1">
+                  <a href="#">Politiques de Retour</a>
+                </li>
+                <li class="menu-item mb-1">
+                  <a href="#">Expédition + Livraison</a>
+                </li>
+                <li class="menu-item mb-1">
+                  <a href="#">Nous Contacter</a>
+                </li>
+                <li class="menu-item mb-1">
+                  <a href="#">FAQ</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6 pb-3">
+            <div class="footer-menu contact-item">
+              <h5 class="widget-title text-capitalize pb-2">Nous Contacter</h5>
+              <p>Vous avez des questions ou des suggestions ? <a href="mailto:"
+                  class="text-decoration-underline">Bookly@gmail.com</a></p>
+              <p>Si vous avez besoin d'aide ? Appelez-nous simplement. <a href="#" class="text-decoration-underline"> 25836947
+             </a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<hr>
+<div id="footer-bottom" class="mb-2">
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between">
+      <div class="ship-and-payment d-flex gap-md-5 flex-wrap">
+        <div class="shipping d-flex">
+          <p>Nous expédions avec :</p>
+          <div class="card-wrap ps-2">
+            <img src="{{ asset('images/dhl.png') }}" alt="visa">
+            <img src="{{ asset('images/shippingcard.png') }}" alt="mastercard">
+          </div>
+        </div>
+        <div class="payment-method d-flex">
+          <p>Options de paiement :</p>
+          <div class="card-wrap ps-2">
+            <img src="{{ asset('images/visa.jpg') }}" alt="visa">
+            <img src="{{ asset('images/mastercard.jpg') }}" alt="mastercard">
+            <img src="{{ asset('images/paypal.jpg') }}" alt="paypal">
+          </div>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>© Copyright 2025 Bookly
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const booksSwiper = new Swiper('.books-swiper', {
+    slidesPerView: 1,
+    spaceBetween: 20,
+    loop: true,
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false,
+    },
+    pagination: {
+      el: '.books-swiper .swiper-pagination',
+      clickable: true,
+    },
+    navigation: {
+      nextEl: '.books-swiper .swiper-button-next',
+      prevEl: '.books-swiper .swiper-button-prev',
+    },
+    breakpoints: {
+      576: {
+        slidesPerView: 2,
+      },
+      768: {
+        slidesPerView: 3,
+      },
+      992: {
+        slidesPerView: 4,
+      },
+      1200: {
+        slidesPerView: 5,
+      }
+    }
+  });
+</script>
+{% endblock %}

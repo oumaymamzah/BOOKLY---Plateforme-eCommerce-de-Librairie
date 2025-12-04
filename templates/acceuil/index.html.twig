@@ -1,0 +1,237 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block stylesheets %}
+<!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+
+<style>
+    html { scroll-behavior: smooth; }
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8fbff;
+    }
+
+    /* Hero */
+    .hero {
+        background: linear-gradient(135deg, #007bff, #00c6ff);
+        color: white;
+        text-align: center;
+        padding: 120px 20px;
+    }
+    .hero h1 { font-size: 3rem; font-weight: 700; }
+    .hero p { font-size: 1.2rem; margin-top: 10px; color: #e0e0e0; }
+    .btn-hero {
+        margin-top: 20px;
+        background-color: white;
+        color: #007bff;
+        font-weight: 600;
+        border-radius: 30px;
+        padding: 10px 25px;
+    }
+    .btn-hero:hover { background-color: #e3f2fd; }
+
+    /* Section titles */
+    .section-title {
+        text-align: center;
+        margin: 70px 0 40px;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        position: relative;
+    }
+    .section-title::after {
+        content: "";
+        width: 80px;
+        height: 4px;
+        background-color: #007bff;
+        display: block;
+        margin: 15px auto 0;
+        border-radius: 2px;
+    }
+
+    /* Swiper container */
+    .swiper {
+        position: relative;
+        padding: 20px 50px;
+    }
+
+    /* Flèches navigation */
+    .swiper-button-next, .swiper-button-prev {
+        border-radius: 50%;
+    }
+
+    .swiper-button-prev { left: 10px; }
+    .swiper-button-next { right: 10px; }
+
+    /* Swiper slides */
+    .swiper-slide {
+        display: flex;
+        justify-content: center;
+    }
+
+    /* Carte Catégorie & Éditeur */
+    .categorie-swiper .card, .editeur-swiper .card {
+        border-radius: 10px;
+        background: #ffffff;
+        padding: 15px;
+        text-align: center;
+        transition: 0.3s ease;
+        width: 250px;
+    }
+    .categorie-swiper .card:hover, .editeur-swiper .card:hover {
+        transform: scale(1.05);
+    }
+    .categorie-swiper .card-title, .editeur-swiper .card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Section Derniers Livres */
+    #livres .card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: 0.3s ease;
+    }
+    #livres .card:hover {
+        transform: translateY(-5px);
+    }
+    #livres .card img {
+        height: 250px;
+        object-fit: cover;
+    }
+    #livres .card-body {
+        background: #f8f9fa;
+        text-align: center;
+    }
+    #livres .btn {
+        border-radius: 20px;
+    }
+
+    footer {
+        background: linear-gradient(90deg, #007bff, #00a8ff);
+        color: white;
+        text-align: center;
+        padding: 20px;
+        margin-top: 80px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<!-- Hero -->
+<section class="hero" id="accueil">
+    <div class="container">
+        <h1>Bienvenue dans Ma Bibliothèque</h1>
+        <p>Explorez les dernières catégories, éditeurs et livres de notre collection numérique.</p>
+        <a href="#categories" class="btn btn-hero">Commencer</a>
+    </div>
+</section>
+
+<!-- Catégories -->
+<section id="categories" class="container my-5">
+    <h2 class="section-title">Catégories</h2>
+    <div class="swiper categorie-swiper">
+        <div class="swiper-wrapper">
+            {% for categorie in categories %}
+                <div class="swiper-slide">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">🏷️ {{ categorie.designation }}</h5>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center text-muted">Aucune catégorie disponible.</p>
+            {% endfor %}
+        </div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+</section>
+
+<!-- Éditeurs -->
+<section id="editeurs" class="container my-5">
+    <h2 class="section-title">Éditeurs</h2>
+    <div class="swiper editeur-swiper">
+        <div class="swiper-wrapper">
+            {% for editeur in editeurs %}
+                <div class="swiper-slide">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">👥{{ editeur.nom }}</h5>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-center text-muted">Aucun éditeur trouvé.</p>
+            {% endfor %}
+        </div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+</section>
+
+<!-- Derniers Livres -->
+<section id="livres" class="container my-5">
+    <h2 class="section-title">Derniers Livres</h2>
+    <div class="row g-4">
+        {% for livre in livres %}
+            <div class="col-md-4 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    {% if livre.imageName is defined and livre.imageName %}
+                        <img src="{{ asset('uploads/books/' ~ livre.imageName) }}" alt="{{ livre.titre }}" class="card-img-top">
+                    {% else %}
+                        <img src="{{ asset('img/java.jpg') }}" alt="Image par défaut" class="card-img-top">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ livre.titre }}</h5>
+                        <a href="#" class="btn btn-primary">Détails</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-center text-muted">Aucun livre trouvé.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Connexion -->
+
+
+<!-- Footer -->
+<footer>
+    &copy; 2025 Ma Bibliothèque | Tous droits réservés
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+<script>
+  const categorieSwiper = new Swiper('.categorie-swiper', {
+    slidesPerView: 3,
+    spaceBetween: 20,
+    loop: true,
+    slidesPerGroup: 1,
+    navigation: {
+      nextEl: '.categorie-swiper .swiper-button-next',
+      prevEl: '.categorie-swiper .swiper-button-prev',
+    },
+  });
+
+  const editeurSwiper = new Swiper('.editeur-swiper', {
+    slidesPerView: 3,
+    spaceBetween: 20,
+    loop: true,
+    slidesPerGroup: 1,
+    navigation: {
+      nextEl: '.editeur-swiper .swiper-button-next',
+      prevEl: '.editeur-swiper .swiper-button-prev',
+    },
+  });
+</script>
+{% endblock %}

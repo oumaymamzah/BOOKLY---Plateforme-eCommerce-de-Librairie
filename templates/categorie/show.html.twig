@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ categorie.nom }} - Livres{% endblock %}
+
+{% block body %}
+<section id="page-header" class="padding-large" style="background-image: url('{{ asset('images/banner-image-bg.jpg') }}'); background-size: cover; background-repeat: no-repeat; background-position: center; height: 300px; display: flex; align-items: center;">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h1 class="display-4 text-white">{{ categorie.nom }}</h1>
+        <p class="lead text-white">{{ livres|length }} livres dans cette catégorie</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="padding-large">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-4">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('app_categories') }}">Catégories</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ categorie.nom }}</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+
+    {% if livres is empty %}
+      <div class="row">
+        <div class="col-12 text-center">
+          <div class="alert alert-info">
+            <h4>Aucun livre trouvé dans cette catégorie</h4>
+            <p>Revenez plus tard pour de nouveaux livres dans {{ categorie.nom }}.</p>
+            <a href="{{ path('app_categories') }}" class="btn btn-primary">Parcourir d'Autres Catégories</a>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="row">
+        {% for livre in livres %}
+        <div class="col-md-3 mb-4">
+          <div class="card h-100">
+            {% if livre.prixUnitaire > 100 %}
+            <div class="position-absolute bg-primary text-white px-2 py-1 rounded" style="top: 10px; left: 10px; font-size: 0.8rem;">10% de réduction</div>
+            {% endif %}
+            <img src="{% if livre.pdfFilename %}{{ asset('uploads/images/' ~ livre.pdfFilename) }}{% else %}{{ asset('images/product-item' ~ (livre.id % 12 + 1) ~ '.png') }}{% endif %}" class="card-img-top" alt="{{ livre.titre }}">
+            <div class="card-body">
+              <h6 class="card-title">
+                <a href="{{ path('app_livre_show', {'id': livre.id}) }}" class="text-decoration-none">{{ livre.titre }}</a>
+              </h6>
+              <p class="card-text text-muted">{{ livre.auteurs ? livre.auteurs|join(', ') : 'Auteur Inconnu' }}</p>
+              <div class="rating text-warning mb-2">
+                <svg class="star star-fill" width="16" height="16">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill" width="16" height="16">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill" width="16" height="16">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill" width="16" height="16">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill" width="16" height="16">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+              </div>
+              <p class="card-text fw-bold text-primary">{{ livre.prixUnitaire }} DT</p>
+              <div class="d-flex flex-column gap-2">
+                <form action="{{ path('app_cart_add', {'id': livre.id}) }}" method="post">
+                  <button type="submit" class="btn btn-primary btn-sm w-100">Ajouter au Panier</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

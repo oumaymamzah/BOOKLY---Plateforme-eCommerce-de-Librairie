@@ -1,0 +1,383 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Tableau de Bord - Bookly{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.dashboard-card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
+
+.metric-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.metric-card.success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.metric-card.warning {
+  background: linear-gradient(135deg, #fcb045 0%, #fd1d1d 100%);
+}
+
+.metric-card.info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.wishlist-item, .cart-item {
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+.wishlist-item:hover, .cart-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-color: #007bff;
+}
+
+.insight-card {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.insight-card .card-body {
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-container {
+    height: 250px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<section id="page-header" class="padding-large" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 300px; display: flex; align-items: center;">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h1 class="display-4 text-white">📊 Mon Tableau de Bord</h1>
+        <p class="lead text-white">Bienvenue, {{ app.user.email }} ! Voici vos statistiques de lecture.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="padding-large">
+  <div class="container">
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+      <div class="card dashboard-card metric-card">
+        <div class="card-body text-center">
+          <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+          <h3 class="card-title">{{ stats.books_in_cart }}</h3>
+          <p class="card-text">Livres dans le Panier</p>
+        </div>
+      </div>
+
+      <div class="card dashboard-card metric-card success">
+        <div class="card-body text-center">
+          <i class="fas fa-heart fa-3x mb-3"></i>
+          <h3 class="card-title">{{ stats.wishlist_count }}</h3>
+          <p class="card-text">Livres dans la Liste d'Envies</p>
+        </div>
+      </div>
+
+      <div class="card dashboard-card metric-card warning">
+        <div class="card-body text-center">
+          <i class="fas fa-dollar-sign fa-3x mb-3"></i>
+          <h3 class="card-title">{{ stats.cart_total|number_format(2) }} DT</h3>
+          <p class="card-text">Total du Panier</p>
+        </div>
+      </div>
+
+      <div class="card dashboard-card metric-card info">
+        <div class="card-body text-center">
+          <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+          <h3 class="card-title">{{ stats.account_age }}</h3>
+          <p class="card-text">Jours en tant que Membre</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+      <div class="col-lg-6 mb-4">
+        <div class="card dashboard-card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0"><i class="fas fa-chart-pie me-2"></i>Centre d'Intérêts de Lecture</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-4">
+        <div class="card dashboard-card">
+          <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0"><i class="fas fa-chart-line me-2"></i>Aperçu de l'Activité</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="activityChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity & Wishlist -->
+    <div class="row">
+      <div class="col-lg-8 mb-4">
+        <!-- Cart Items -->
+        <div class="card dashboard-card mb-4">
+          <div class="card-header bg-warning text-dark">
+            <h5 class="card-title mb-0"><i class="fas fa-shopping-cart me-2"></i>Mon Panier</h5>
+          </div>
+          <div class="card-body">
+            {% if stats.cart_items %}
+              <div class="row">
+                {% for item in stats.cart_items %}
+                <div class="col-md-6 mb-3">
+                  <div class="cart-item">
+                    <div class="d-flex align-items-center">
+                      <img src="{% if item.pdfFilename %}{{ asset('uploads/images/' ~ item.pdfFilename) }}{% else %}{{ asset('images/product-item' ~ (loop.index % 12 + 1) ~ '.png') }}{% endif %}"
+                           alt="{{ item.titre }}" class="img-fluid me-3" style="width: 60px; height: 80px; object-fit: cover;">
+                      <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ item.titre }}</h6>
+                        <p class="text-muted small mb-1">{{ item.auteurs ? item.auteurs|join(', ') : 'Auteur Inconnu' }}</p>
+                        <span class="badge bg-primary">{{ item.prixUnitaire }} DT</span>
+                      </div>
+                      <div class="ms-2">
+                        <a href="{{ path('app_livre_show', {'id': item.id}) }}" class="btn btn-sm btn-outline-info" title="Voir les Détails">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              <div class="text-center mt-3">
+                <a href="{{ path('app_cart') }}" class="btn btn-warning">Voir le Panier Complet</a>
+              </div>
+            {% else %}
+              <div class="text-center py-4">
+                <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Votre panier est vide</h5>
+                <p class="text-muted">Ajoutez des livres pour commencer !</p>
+                <a href="{{ path('app_livres_index') }}" class="btn btn-warning">Parcourir les Livres</a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Wishlist Items -->
+        <div class="card dashboard-card">
+          <div class="card-header bg-danger text-white">
+            <h5 class="card-title mb-0"><i class="fas fa-heart me-2"></i>Ma Liste d'Envies</h5>
+          </div>
+          <div class="card-body">
+            {% if stats.wishlist_items %}
+              <div class="row">
+                {% for item in stats.wishlist_items %}
+                <div class="col-md-6 mb-3">
+                  <div class="wishlist-item">
+                    <div class="d-flex align-items-center">
+                      <img src="{% if item.pdfFilename %}{{ asset('uploads/images/' ~ item.pdfFilename) }}{% else %}{{ asset('images/product-item' ~ (loop.index % 12 + 1) ~ '.png') }}{% endif %}"
+                           alt="{{ item.titre }}" class="img-fluid me-3" style="width: 60px; height: 80px; object-fit: cover;">
+                      <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ item.titre }}</h6>
+                        <p class="text-muted small mb-1">{{ item.auteurs ? item.auteurs|join(', ') : 'Unknown' }}</p>
+                        <span class="badge bg-danger">{{ item.prixUnitaire }} DT</span>
+                      </div>
+                      <div class="ms-2">
+                        <form action="{{ path('app_cart_add', {'id': item.id}) }}" method="post" class="d-inline">
+                          <button type="submit" class="btn btn-sm btn-outline-success" title="Ajouter au Panier">
+                            <i class="fas fa-cart-plus"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              <div class="text-center mt-3">
+                <a href="{{ path('app_wishlist') }}" class="btn btn-danger">Voir Toute la Liste d'Envies</a>
+              </div>
+            {% else %}
+              <div class="text-center py-4">
+                <i class="fas fa-heart-broken fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Votre liste d'envies est vide</h5>
+                <p class="text-muted">Sauvegardez les livres que vous aimez pour plus tard !</p>
+                <a href="{{ path('app_livres_index') }}" class="btn btn-danger">Parcourir les Livres</a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 mb-4">
+        <!-- Reading Insights -->
+        <div class="card dashboard-card insight-card mb-4">
+          <div class="card-body text-center">
+            <i class="fas fa-lightbulb fa-3x mb-3"></i>
+            <h5 class="card-title">Aperçu de Lecture</h5>
+            <p class="card-text">Vous êtes actif depuis {{ stats.account_age }} jours ! Continuez à explorer notre collection.</p>
+          </div>
+        </div>
+
+        <!-- Account Settings -->
+        <div class="card dashboard-card">
+          <div class="card-header bg-dark text-white">
+            <h5 class="card-title mb-0"><i class="fas fa-user-cog me-2"></i>Paramètres du Compte</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a href="#" class="btn btn-outline-primary">
+                <i class="fas fa-user-edit me-2"></i>Modifier le Profil
+              </a>
+              <a href="#" class="btn btn-outline-info">
+                <i class="fas fa-key me-2"></i>Changer le Mot de Passe
+              </a>
+              <a href="#" class="btn btn-outline-secondary">
+                <i class="fas fa-bell me-2"></i>Notifications
+              </a>
+              <hr>
+              <a href="{{ path('app_logout') }}" class="btn btn-outline-danger">
+                <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card dashboard-card mt-3">
+          <div class="card-header bg-light">
+            <h6 class="card-title mb-0"><i class="fas fa-bolt me-2"></i>Actions Rapides</h6>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a href="{{ path('app_livres_index') }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-book me-2"></i>Parcourir les Livres
+              </a>
+              <a href="{{ path('app_categories') }}" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-tags me-2"></i>Explorer les Catégories
+              </a>
+              <a href="{{ path('app_cart') }}" class="btn btn-sm btn-outline-warning">
+                <i class="fas fa-shopping-cart me-2"></i>Voir le Panier
+              </a>
+              <a href="{{ path('app_home') }}" class="btn btn-sm btn-outline-info">
+                <i class="fas fa-home me-2"></i>Retour à l'Accueil
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Category Distribution Chart
+const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+const categoryChart = new Chart(categoryCtx, {
+  type: 'doughnut',
+  data: {
+    labels: {{ stats.category_labels|json_encode|raw }},
+    datasets: [{
+      data: {{ stats.category_data|json_encode|raw }},
+      backgroundColor: [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+        '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+      ],
+      borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return context.label + ': ' + context.parsed + ' livres';
+          }
+        }
+      }
+    }
+  }
+});
+
+// Activity Chart
+const activityCtx = document.getElementById('activityChart').getContext('2d');
+const activityChart = new Chart(activityCtx, {
+  type: 'line',
+  data: {
+    labels: {{ stats.activity_labels|json_encode|raw }},
+    datasets: [{
+      label: 'Livres Ajoutés au Panier',
+      data: {{ stats.activity_data|json_encode|raw }},
+      borderColor: '#28a745',
+      backgroundColor: 'rgba(40, 167, 69, 0.1)',
+      tension: 0.4,
+      fill: true
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        display: false
+      }
+    }
+  }
+});
+</script>
+{% endblock %}

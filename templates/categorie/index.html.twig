@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Catégories{% endblock %}
+
+{% block body %}
+<section id="page-header" class="padding-large" style="background-image: url('{{ asset('images/banner-image-bg.jpg') }}'); background-size: cover; background-repeat: no-repeat; background-position: center; height: 300px; display: flex; align-items: center;">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h1 class="display-4 text-white">Catégories</h1>
+        <p class="lead text-white">Explorez nos catégories de livres</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="padding-large">
+  <div class="container">
+    <!-- Categories Section -->
+    <div class="row">
+      <div class="col-12">
+        <h3 class="mb-4 text-center">📚 Catégories</h3>
+      </div>
+      {% for categorie in categories %}
+      <div class="col-md-3 mb-4">
+        <div class="card h-100 category-card">
+          <img src="{% if categorie.imageFilename %}{{ asset('uploads/images/' ~ categorie.imageFilename) }}{% else %}{{ asset('images/category' ~ loop.index ~ '.jpg') }}{% endif %}" class="card-img-top" alt="{{ categorie.nom }}">
+          <div class="card-body text-center">
+            <h6 class="card-title">{{ categorie.nom }}</h6>
+            {% set categoryBooks = [] %}
+            {% for livre in livres %}
+              {% if livre.categorie and livre.categorie.id == categorie.id %}
+                {% set categoryBooks = categoryBooks|merge([livre]) %}
+              {% endif %}
+            {% endfor %}
+            <p class="text-muted small">{{ categoryBooks|length }} livres disponibles</p>
+            <a href="{{ path('app_category_show', {'id': categorie.id}) }}" class="btn btn-outline-primary btn-sm">Voir les Livres</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+
+<style>
+.category-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ma Liste d'Envies{% endblock %}
+
+{% block body %}
+<section id="page-header" class="padding-large" style="background-image: url('{{ asset('images/banner-image-bg.jpg') }}'); background-size: cover; background-repeat: no-repeat; background-position: center; height: 300px; display: flex; align-items: center;">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h1 class="display-4 text-white">Ma Liste d'Envies</h1>
+        <p class="lead text-white">{{ wishlistItems|length }} livres dans votre liste d'envies</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="padding-large">
+  <div class="container">
+    {% if wishlistItems is empty %}
+      <div class="row">
+        <div class="col-12 text-center">
+          <div class="alert alert-info">
+            <h4>Votre liste d'envies est vide</h4>
+            <p>Parcourez notre collection et ajoutez des livres à votre liste d'envies !</p>
+            <a href="{{ path('app_categories') }}" class="btn btn-primary">Parcourir les Livres</a>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="row">
+        {% for livre in wishlistItems %}
+        <div class="col-md-3 mb-4">
+          <div class="card h-100">
+            {% if livre.prixUnitaire > 100 %}
+            <div class="position-absolute bg-primary text-white px-2 py-1 rounded" style="top: 10px; left: 10px; font-size: 0.8rem;">10% de réduction</div>
+            {% endif %}
+            <img src="{% if livre.pdfFilename %}{{ asset('uploads/images/' ~ livre.pdfFilename) }}{% else %}{{ asset('images/product-item' ~ (livre.id % 12 + 1) ~ '.png') }}{% endif %}" class="card-img-top" alt="{{ livre.titre }}">
+            <div class="card-body">
+              <h6 class="card-title">
+                <a href="{{ path('app_livre_show', {'id': livre.id}) }}" class="text-decoration-none">{{ livre.titre }}</a>
+              </h6>
+              <p class="card-text text-muted">{{ livre.auteurs ? livre.auteurs|join(', ') : 'Auteur Inconnu' }}</p>
+              <div class="rating text-warning mb-2">
+                <svg class="star star-fill" width="16" height="16">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill" width="16" height="16">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill" width="16" height="16">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill" width="16" height="16">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+                <svg class="star star-fill" width="16" height="16">
+                  <use xlink:href="#star-fill"></use>
+                </svg>
+              </div>
+              <p class="card-text fw-bold text-primary">{{ livre.prixUnitaire }} DT</p>
+              <div class="d-flex gap-2">
+                <form action="{{ path('app_cart_add', {'id': livre.id}) }}" method="post" class="flex-fill">
+                  <button type="submit" class="btn btn-primary btn-sm w-100">Ajouter au Panier</button>
+                </form>
+                <a href="{{ path('app_wishlist_remove', {'id': livre.id}) }}" class="btn btn-outline-danger btn-sm">
+                  <svg width="16" height="16">
+                    <use xlink:href="#heart"></use>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

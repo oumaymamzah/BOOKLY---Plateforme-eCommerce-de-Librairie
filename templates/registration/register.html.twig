@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block stylesheets %}{% endblock %}
+
+{% block body %}
+<section id="page-header" class="padding-large" style="background-image: url('{{ asset('images/banner-image-bg.jpg') }}'); background-size: cover; background-repeat: no-repeat; background-position: center; height: 300px; display: flex; align-items: center;">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <h1 class="display-4 text-white">Inscription</h1>
+        <p class="lead text-white">Créez votre compte</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="padding-large">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body p-5">
+            <div class="text-center mb-4">
+              <div class="icon mb-3" style="font-size: 3rem;">✨</div>
+              <h2>Créer un compte</h2>
+              <p>Rejoignez notre bibliothèque numérique</p>
+            </div>
+
+            {% for message in app.flashes('error') %}
+              <div class="alert alert-danger">
+                {{ message }}
+              </div>
+            {% endfor %}
+
+            {% for message in app.flashes('success') %}
+              <div class="alert alert-success">
+                {{ message }}
+              </div>
+            {% endfor %}
+
+            {{ form_start(registrationForm, {'attr': {'novalidate': 'novalidate'}}) }}
+
+              <div class="mb-3">
+                <label for="{{ registrationForm.email.vars.id }}" class="form-label">📧 Adresse e-mail</label>
+                {{ form_widget(registrationForm.email, {
+                  'attr': {
+                    'class': 'form-control',
+                    'placeholder': 'votre@email.com'
+                  }
+                }) }}
+                {{ form_errors(registrationForm.email) }}
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ registrationForm.plainPassword.vars.id }}" class="form-label">🔒 Mot de passe</label>
+                {{ form_widget(registrationForm.plainPassword, {
+                  'attr': {
+                    'class': 'form-control',
+                    'placeholder': '••••••••'
+                  }
+                }) }}
+                {{ form_errors(registrationForm.plainPassword) }}
+                <small class="form-text text-muted">Minimum 6 caractères</small>
+              </div>
+
+              <div class="mb-3 form-check">
+                {{ form_widget(registrationForm.agreeTerms) }}
+                {{ form_label(registrationForm.agreeTerms, 'J\'accepte les conditions d\'utilisation et la politique de confidentialité'|raw) }}
+                {{ form_errors(registrationForm.agreeTerms) }}
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 mb-3">S'inscrire</button>
+
+            {{ form_end(registrationForm) }}
+
+            <hr>
+
+            <div class="text-center">
+              <p>Vous avez déjà un compte ? <a href="{{ path('app_login') }}">Se connecter</a></p>
+              <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">← Retour à l'accueil</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

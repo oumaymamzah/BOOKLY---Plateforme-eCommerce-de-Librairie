@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Ouvrier{% endblock %}
+
+{% block body %}
+    <h1>Create new Ouvrier</h1>
+
+    {{ include('ouvrier/_form.html.twig') }}
+
+    <a href="{{ path('app_ouvrier_index') }}"><span class="btn btn-primary"><i class="fa fa-backward">&nbsp;</i>Retour</span></a>
+
+{% endblock %}
