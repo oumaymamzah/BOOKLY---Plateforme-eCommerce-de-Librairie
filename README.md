@@ -32,8 +32,7 @@ Développer une plateforme eCommerce complète de vente de livres avec :
   - **Catégories** : Gestion des catégories de livres  
   - **Auteurs** : Gestion des auteurs  
   - **Éditeurs** : Gestion des éditeurs  
-  - **Utilisateurs** : Gestion des comptes clients  
-  - **Ouvriers** : Gestion du personnel (si applicable)  
+  - **Utilisateurs** : Gestion des comptes clients    
 
 ---
 
@@ -44,7 +43,6 @@ Développer une plateforme eCommerce complète de vente de livres avec :
 - **Auteur** : nom, prénom  
 - **Editeur** : nom, pays, adresse, téléphone  
 - **User** : comptes utilisateurs avec rôles et authentification  
-- **Ouvrier** : nom, prénom, salaire, date de naissance  
 
 ---
 
